@@ -7,7 +7,7 @@ if [[ -z "$RESTIC_HOME_DIR" ]]; then
 fi
 
 # Load environment variables from the .env file
-export $(grep -v '^#' $RESTIC_HOME_DIR/restic.env | xargs)
+set -a && source $RESTIC_HOME_DIR/restic.env && set +a
 
 # Check if the repository is already initialized
 if restic snapshots > /dev/null 2>&1; then

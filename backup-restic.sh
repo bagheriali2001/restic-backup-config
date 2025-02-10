@@ -7,7 +7,7 @@ if [[ -z "$RESTIC_HOME_DIR" ]]; then
 fi
 
 # Load environment variables from the .env file
-export $(grep -v '^#' $RESTIC_HOME_DIR/restic.env | xargs)
+set -a && source $RESTIC_HOME_DIR/restic.env && set +a
 
 # Ensure the required environment variables are set
 if [[ -z "$RESTIC_REPOSITORY" || -z "$RESTIC_PASSWORD" || -z "$BACKUP_PATH" || -z "$KEEP_LAST" ]]; then
@@ -17,7 +17,17 @@ fi
 
 # Perform backup
 echo "Starting backup for $BACKUP_PATH..."
-restic backup "$BACKUP_PATH" --verbose
+
+# Construct the restic command
+CMD="restic backup \"$BACKUP_PATH\" --verbose"
+
+# Check if UPLOAD_BANDWIDTH_LIMIT is set and add --limit-upload if it is
+if [ -n "$UPLOAD_BANDWIDTH_LIMIT" ]; then
+    CMD+=" --limit-upload $UPLOAD_BANDWIDTH_LIMIT"
+fi
+
+# Execute the command
+eval $CMD
 
 # Prune old backups based on the KEEP_LAST value
 echo "Pruning old backups (keeping last $KEEP_LAST snapshots)..."
