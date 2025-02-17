@@ -10,11 +10,11 @@ fi
 set -a && source $RESTIC_HOME_DIR/restic.env && set +a
 
 # Check if the repository is already initialized
-if restic snapshots > /dev/null 2>&1; then
+if sudo -E restic snapshots > /dev/null 2>&1; then
     echo "Restic repository already initialized."
 else
     echo "Initializing Restic repository..."
-    restic init --repo "$RESTIC_REPOSITORY"
+    sudo -E restic init --repo "$RESTIC_REPOSITORY"
 
     if [ $? -eq 0 ]; then
         echo "Restic repository initialized successfully!"

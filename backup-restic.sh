@@ -19,7 +19,7 @@ fi
 echo "Starting backup for $BACKUP_PATH..."
 
 # Construct the restic command
-CMD="restic backup \"$BACKUP_PATH\" --verbose"
+CMD="sudo -E restic backup \"$BACKUP_PATH\" --verbose"
 
 # Check if UPLOAD_BANDWIDTH_LIMIT is set and add --limit-upload if it is
 if [ -n "$UPLOAD_BANDWIDTH_LIMIT" ]; then
@@ -31,6 +31,6 @@ eval $CMD
 
 # Prune old backups based on the KEEP_LAST value
 echo "Pruning old backups (keeping last $KEEP_LAST snapshots)..."
-restic forget --keep-last "$KEEP_LAST" --prune
+sudo -E restic forget --keep-last "$KEEP_LAST" --prune
 
 echo "Backup completed successfully!"
