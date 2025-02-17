@@ -1,4 +1,4 @@
-# restic-backup-config
+# restic-backup
 
 Run the below commands in order:
 
@@ -42,3 +42,22 @@ and add the following line with your own time configuration (You can use [Cronta
 | `UPLOAD_BANDWIDTH_LIMIT`    | To limit the upload bandwidth of restic backup, used when you don't want restic to use all of the server bandwidth. In `KiB/s`   |
 | `BACKUP_PATH`    | Path to the data you want to backup   |
 | `KEEP_LAST`    | Tells restic that how many snapshots it should keep   |
+
+## Finding all docker volumes
+
+Use `sudo docker ps -q | xargs sudo docker inspect --format '{{.Name}}:{{"\n"}} {{range .Mounts}}{{.Source}}:{{.Destination}}{{"\n"}} {{end}}' | sed 's/^\/\(.*\)/\1/'`
+
+## Other Backups
+
+For unnamed / named docker volumes, use `sudo docker run --rm -v VOLUME_NAME:/data -v /backup_root:/backup_root busybox cp -r /data /backup_root/unnamed_volumes/name_for_volume`, before backing up the restic repo. Note that you can find out the volume name in `/var/lib/docker/volumes/VOLUME_NAME/_data`
+
+## Restoring Backups
+
+Use the following commands:
+`RESTIC_REPOSITORY="" RESTIC_PASSWORD="" sudo -E restic snapshots`
+
+Then restore using:
+`RESTIC_REPOSITORY="" RESTIC_PASSWORD="" BACKUP_PATH="" sudo -E restic restore <snapshot-id> --target $BACKUP_PATH --verbose`
+
+Or:
+`RESTIC_REPOSITORY="" RESTIC_PASSWORD="" BACKUP_PATH="" sudo -E restic restore latest --target $BACKUP_PATH --verbose`
